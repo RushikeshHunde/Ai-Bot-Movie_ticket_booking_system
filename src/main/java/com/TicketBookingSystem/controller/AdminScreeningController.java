@@ -45,7 +45,7 @@ public class AdminScreeningController {
         model.addAttribute("keyword", keyword);
         return "manage-screening";
     }
-    
+   
     
     
     @PostMapping("/update-screening-details")

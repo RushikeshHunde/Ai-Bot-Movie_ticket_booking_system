@@ -329,12 +329,24 @@ public class BookingController {
 		}
 	}
 
-
-
 	@GetMapping("/my-bookings")
 	public String showMyBookingsPage() {
 	    // This returns the name of your HTML file: my-bookings.html
 	    return "my-bookings";
+	}
+	
+	@GetMapping("/displaybookings")
+	public String showBookingTable(HttpSession session, Model model) {
+	    // Security check: Only let people in if they have the ADMIN session
+	    if (session.getAttribute("userRole") == null || !session.getAttribute("userRole").equals("ADMIN")) {
+	        return "redirect:/admin/login"; 
+	    }
+
+	    // Fetch data from MySQL
+	    List<Ticket> allTickets = ticketRepository.findAll();
+	    model.addAttribute("allTickets", allTickets);
+	    
+	    return "displaybookings"; // Points to the HTML page with the table
 	}
 
 }

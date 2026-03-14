@@ -1,15 +1,37 @@
-# 1. Reset any bad tracking from the target folder
-git rm -r --cached . 2> /dev/null
+# --- Java & Maven ---
+target/
+*.class
+*.jar
+*.war
+*.ear
 
-# 2. Tell Git to ignore the target folder forever
-echo "target/" >> .gitignore
-echo ".gradle/" >> .gitignore
+# --- Eclipse Specific ---
+.metadata/
+.settings/
+.project
+.classpath
+.factorypath
+bin/
+*.launch
+*.tmp
+*.bak
 
-# 3. Add your actual project files
-git add src pom.xml .gitignore
+# --- IntelliJ Specific ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
 
-# 4. Commit the changes
-git commit -m "Uploading source code and pom.xml from root"
+# --- Gradle (if used) ---
+.gradle/
+build/
 
-# 5. Push it to GitHub
-git push -f origin main
+# --- OS & IDE Logs ---
+*.log
+.DS_Store
+Thumbs.db
+
+# --- Environment & Security ---
+.env
+auth.txt

@@ -114,9 +114,9 @@ public class MovieController {
 
         if ("admin@gmail.com".equals(email) && "admin@210803".equals(password)) {
             session.setAttribute("adminSession", "active");
+            session.setAttribute("userRole", "ADMIN");
 
-            // If the user selected "Add New Movie" in the dropdown,
-            // it will now correctly go to the setup page
+            
             if (targetUrl != null && !targetUrl.equals("/")) {
                 return "redirect:" + targetUrl;
             }
