@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+	<div th:fragment="ai-assistant">
+		<div id="ai-assistant-container"
+			class="fixed bottom-2 right-6 z-[9999] flex flex-col items-end gap-3 no-print">
+
+			<div id="ai-status-bubble"
+				class="hidden bg-white text-slate-900 px-4 py-2 rounded-2xl shadow-xl border border-slate-200 text-xs font-bold animate-bounce mb-2">
+				Listening...</div>
+
+			<button id="start-voice-btn"
+				class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 group border-4 border-slate-900">
+				<i class="fas fa-robot text-2xl group-hover:animate-pulse"></i> <span
+					id="ai-pulse"
+					class="absolute inset-0 rounded-full bg-cyan-500 animate-ping opacity-0"></span>
+			</button>
+		</div>
+
+<script th:inline="javascript" type="text/javascript">
+    let shouldBeListening = false;
+    let hasExecuted = false;
+    let ai;
+
+    function robotSpeak(text) {
+        window.speechSynthesis.cancel();
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'en-IN';
+        window.speechSynthesis.speak(speech);
+    }
+
+    function startBot(isAutoResume = false) {
+        shouldBeListening = true;
+        sessionStorage.setItem('ai_persistent_state', 'active');
+        try {
+            ai.start();
+            if (!isAutoResume) robotSpeak("AI System Online. I'm moving with you.");
+        } catch (e) { console.log("Mic starting..."); }
+        updateUI(true);
+    }
+
+    function stopBot() {
+        shouldBeListening = false;
+        sessionStorage.setItem('ai_persistent_state', 'inactive');
+        ai.stop();
+        robotSpeak("Deactivating. Goodbye.");
+        updateUI(false);
+    }
+
+    function updateUI(isActive) {
+        const btn = document.getElementById('start-voice-btn');
+        const bubble = document.getElementById('ai-status-bubble');
+        const pulse = document.getElementById('ai-pulse');
+        if (!btn) return;
+
+        if (isActive) {
+            btn.classList.replace('bg-cyan-500', 'bg-red-500');
+            bubble.classList.remove('hidden');
+            pulse.classList.replace('opacity-0', 'opacity-30');
+        } else {
+            btn.classList.replace('bg-red-500', 'bg-cyan-500');
+            bubble.classList.add('hidden');
+            pulse.classList.replace('opacity-30', 'opacity-0');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Recognition) return;
+
+        ai = new Recognition();
+        ai.lang = 'en-IN';
+        ai.continuous = true;
+        ai.interimResults = true;
+
+        ai.onend = () => { if (shouldBeListening) ai.start(); };
+
+        ai.onresult = (event) => {
+            const result = event.results[event.results.length - 1];
+            const transcript = result[0].transcript.trim().toLowerCase();
+            document.getElementById('ai-status-bubble').innerText = "Heard: " + transcript;
+            
+            if (transcript.includes("stop") || transcript.includes("exit")) {
+                stopBot();
+                return;
+            }
+
+            if (result.isFinal && !hasExecuted) {
+                hasExecuted = true;
+                performNavigation(transcript);
+                handleAdvancedAi(transcript);
+                setTimeout(() => { hasExecuted = false; }, 2000);
+            }
+        };
+       
+        if (sessionStorage.getItem('ai_persistent_state') === 'active') startBot(true);
+
+        document.getElementById('start-voice-btn').onclick = () => {
+            (!shouldBeListening) ? startBot() : stopBot();
+        };
+    });
+    
+    function handleAdvancedAi(transcript) {
+        const cmd = transcript.toLowerCase();
+        
+        // 1. EMAIL & LOGIN
+        if (cmd.includes("enter email") || cmd.includes("my email is")) {
+            let email = cmd.replace("enter email", "").replace("my email is", "").trim();
+            email = email.replace(/\s+at\s+the\s+rate\s+/g, "@").replace(/\s+at\s+/g, "@").replace(/\s+dot\s+/g, ".").replace(/\s+/g, "");
+            const field = document.querySelector('input[name="email"]');
+            if (field) { field.value = email; robotSpeak("Email entered."); }
+        }
+
+        if (cmd.includes("select")) {
+            const select = document.querySelector('select[name="targetUrl"]');
+            if (select) {
+                if (cmd.includes("add movie in booking")) select.value = "/admin/setup-booking";
+                else if (cmd.includes("add new movie")) select.value = "/admin/add";
+                else if (cmd.includes("manage shows")) select.value = "/admin/manage-shows";
+                robotSpeak("Selection updated.");
+            }
+        }
+
+        // 2. ADMIN FORM FIELDS
+        if (cmd.includes("set movie title")) {
+            const title = cmd.split("title").pop().trim();
+            const field = document.querySelector('input[name="movieTitle"]');
+            if (field) { field.value = title; robotSpeak("Title set."); }
+        }
+
+        if (cmd.includes("theatre name")) {
+            const th = cmd.split("name").pop().trim();
+            const field = document.querySelector('input[name="theatreName"]');
+            if (field) { field.value = th; robotSpeak("Theatre set."); }
+        }
+        
+        if (cmd.includes("set city")) {
+            const title = cmd.split("city").pop().trim();
+            const field = document.querySelector('input[name="targetCity"]');
+            if (field) { field.value = title; robotSpeak("City set."); }
+        }
+        
+       
+        if (cmd.includes("select") || cmd.includes("set") || cmd.includes("hall")) {
+            // Extract the digits (e.g., "hall 5" -> "5")
+            const match = cmd.match(/\d+/); 
+            
+            if (match) {
+                let num = match[0];
+            
+                const hallId = "H" + num;             
+                const field = document.querySelector('select[name="hallNumber"], input[name="hallNumber"]');
+                if (field) { field.value = th; robotSpeak("Theatre set."); 
+                }
+            } else {
+                robotSpeak("Which hall number? Please say 1 to 10.");
+            }
+        }
+
+        
+       
+        if (cmd.includes("book") || cmd.includes("select")) {
+            
+            let targetTitle = cmd.replace("i want to book", "")
+                                 .replace("select movie", "")
+                                 .replace("book", "")
+                                 .replace("the movie", "")
+                                 .trim();
+            
+            // 2. Get all movie cards (using your specific class structure)
+            const allMovies = document.querySelectorAll('.group.relative.flex.flex-col');
+            let foundCard = null;
+
+            allMovies.forEach(card => {
+                const h3 = card.querySelector('h3');
+                if (!h3) return;
+                
+                const actualTitle = h3.innerText.toLowerCase().trim();
+                
+                // 3. Check if the cleaned voice name is inside the actual title
+                if (actualTitle.includes(targetTitle) || targetTitle.includes(actualTitle)) {
+                    foundCard = card;
+                }
+            });
+
+            if (foundCard) {
+                const finalTitle = foundCard.querySelector('h3').innerText;
+                
+                // Visual Highlight: Gold ring
+                document.querySelectorAll('.movie-focus').forEach(el => {
+                    el.classList.remove('movie-focus', 'ring-4', 'ring-amber-500');
+                });
+                foundCard.classList.add('movie-focus', 'ring-4', 'ring-amber-500', 'rounded-2xl');
+                foundCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                window.selectedMovieContext = foundCard;
+                robotSpeak("Found " + finalTitle + ". Should I open it?");
+            } else {
+                robotSpeak("I couldn't find " + targetTitle);
+            }
+        }        
+        
+        // 3. USER SEATS & BOOKING
+        if (cmd.includes("select seat")) {
+            const seatToFind = cmd.split("seat").pop().trim().toUpperCase();
+            const btn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.trim().toUpperCase() === seatToFind);
+            if (btn) { btn.click(); robotSpeak("Seat " + seatToFind + " toggled."); }
+        }
+
+        if (cmd.includes("my name is")) {
+            const name = cmd.split("is").pop().trim();
+            const field = document.querySelector('input[name="userName"]');
+            if (field) { field.value = name; robotSpeak("Name set."); }
+        }
+
+        // 4. SUBMIT LOGIC (FIXED BRACKETS)
+        if (cmd.includes("book ticket") || cmd.includes("pay now") || cmd.includes("submit") || cmd.includes("save show")) {
+            const allButtons = Array.from(document.querySelectorAll('button[type="submit"], input[type="submit"]'));
+            const submitBtn = allButtons.find(btn => {
+                const style = window.getComputedStyle(btn);
+                return style.display !== 'none' && btn.offsetHeight > 0;
+            });
+
+            if (submitBtn) {
+                robotSpeak("Action confirmed.");
+                setTimeout(() => { submitBtn.click(); }, 2000);
+            } else {
+                robotSpeak("I cannot find the submit button. Check your details.");
+            }
+        }
+
+        if (cmd.includes("logout") || cmd.includes("sign out")) {
+            robotSpeak("Logging out. Clearing session and returning to home page.");
+            
+            // 1. Kill the AI state locally so it doesn't try to restart
+            shouldBeListening = false;
+            sessionStorage.removeItem('ai_persistent_state');
+            
+            // 2. Clear visual cues
+            updateUI(false);
+
+            setTimeout(() => { 
+                // 3. Force a navigation to the logout endpoint
+                // Use window.location.href to ensure a full page load
+                window.location.href = "/admin/logout"; 
+            }, 1500);
+            return;
+        }
+        
+        
+        if (cmd.includes("i have paid") || cmd.includes("download ticket") || cmd.includes("paid")) {
+            // 1. Find the confirm payment button
+            const confirmBtn = document.querySelector('form[action="/confirm-payment"] button[type="submit"]');
+            
+            if (confirmBtn) {
+                robotSpeak("Verifying payment and generating your ticket. Please wait.");
+                
+                // Visual feedback: briefly highlight the button before clicking
+                confirmBtn.classList.add('ring-4', 'ring-cyan-300', 'scale-105');
+                
+                setTimeout(() => {
+                    confirmBtn.click();
+                }, 1500);
+            } else {
+                robotSpeak("I couldn't find the confirmation button. Please click it manually.");
+            }
+        }
+    }
+
+    function performNavigation(command) {
+        const cmd = command.toLowerCase();
+
+        // Priority Gate
+        if (cmd.includes("select") || cmd.includes("my name") || cmd.includes("set") || cmd.includes("enter email")) {
+            return;
+        }
+        
+        if (cmd.includes("sign in") || cmd.includes("login")) {
+            robotSpeak("Opening sign in page.");
+            setTimeout(() => { window.location.assign("/login"); }, 2000);
+            return;
+        }
+        
+        if (cmd.includes("my bookings") || cmd.includes("my booking")) {
+            robotSpeak("Opening my-booking page.");
+            setTimeout(() => { window.location.assign("/my-bookings"); }, 2000);
+            return;
+        }
+
+        if (cmd.includes("help")) {
+            window.location.assign("/info");
+            return;
+        }
+
+        if (cmd.includes("close")) {
+            window.history.back();
+            return;
+        }
+        
+        if (cmd.includes("go back") || cmd.includes("return") || cmd.includes("previous page")) {
+            robotSpeak("Going back.");
+            setTimeout(() => { 
+                window.history.back(); 
+            }, 800);
+            return;
+        }
+        const routes = { "home": "/", "ongoing": "/booking", "venue": "/theatres", "admin": "/login" }; 
+       
+        for (let key in routes) {
+            if (cmd.includes(key)) {
+                robotSpeak("Going to " + key);
+                setTimeout(() => { window.location.assign(routes[key]); }, 2000);
+                return;
+            }
+        }
+    }
+</script>
+
+
+	</div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Command Guide | CinePass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-white p-8 font-sans">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black text-cyan-500 mb-2 tracking-tighter italic">CINETIX VOICE COMMANDS</h1>
+            <p class="text-slate-400 uppercase tracking-widest text-xs font-bold">Updated Voice Control & Navigation System</p>
+        </header>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl transition hover:border-cyan-500/50">
+                <h3 class="text-cyan-500 font-bold mb-4 flex items-center">
+                    <i class="fas fa-map-marked-alt mr-3"></i> Navigation
+                </h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li><b class="text-white">"Home" / "Ongoing"</b> - Quick jump</li>
+                    <li><b class="text-white">"Sign in" / "Login"</b> - To login page</li>
+                    <li><b class="text-white">"Go back" / "Return"</b> - Previous page</li>
+                    <li><b class="text-white">"Help"</b> - This guide</li>
+                    <li><b class="text-white">"close"</b> - This closes the guide</li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl transition hover:border-amber-500/50">
+                <h3 class="text-amber-500 font-bold mb-4 flex items-center">
+                    <i class="fas fa-tools mr-3"></i> Admin Controls
+                </h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li><b class="text-white">"Set movie title [Name]"</b> - Fills title</li>
+                    <li><b class="text-white">"Set city [City]"</b> - Location setup</li>
+                    <li><b class="text-white">"Theatre name [Name]"</b> - Hall location</li>
+                    <li><b class="text-white">"Select hall [1-10]"</b> - <span class="text-amber-200 italic">Sets H1-H10 automatically</span></li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl transition hover:border-green-500/50">
+                <h3 class="text-green-500 font-bold mb-4 flex items-center">
+                    <i class="fas fa-ticket-alt mr-3"></i> User Booking
+                </h3>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li><b class="text-white">"Select seat [A1]"</b> - Toggles seat</li>
+                    <li><b class="text-white">"My name is [Name]"</b> - Fills name</li>
+                    <li><b class="text-white">"My email is [Email]"</b> - Fills email</li>
+                    <li><b class="text-white">"Book ticket" / "Submit"</b> - Saves data</li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl lg:col-span-3 transition hover:border-red-500/50">
+                <h3 class="text-red-500 font-bold mb-4 flex items-center">
+                    <i class="fas fa-power-off mr-3"></i> System Operations
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li><b class="text-white">"Stop" / "Exit"</b> - Kills AI & Mic session</li>
+                        <li><b class="text-white">"Logout" / "Sign out"</b> - Clears admin session</li>
+                    </ul>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li><b class="text-white">"I have paid" / "Paid"</b> - Confirm payment</li>
+                        <li><b class="text-white">"Download ticket"</b> - PDF extraction</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-12 text-center">
+            <button onclick="window.history.back()" 
+                    class="bg-slate-800 hover:bg-slate-700 px-10 py-4 rounded-2xl transition-all font-bold text-slate-400 border border-slate-700 group">
+                <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Say "Go back" to return
+            </button>
+            <p class="mt-4 text-slate-600 text-[10px] uppercase tracking-widest font-bold">
+                Cinetix AI v3.0 | Persistent State Active
+            </p>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/header :: ai-assistant}"></div>
+</body>
+</html>

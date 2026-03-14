@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Premium Venues | CinePass Pune</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-[#0f172a] text-slate-200 selection:bg-cyan-500 selection:text-white">
+
+    <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-black text-cyan-400 tracking-tighter italic">CINEPASS</a>
+            <div class="space-x-8 text-xs font-bold uppercase tracking-widest">
+                <a href="/" class="hover:text-cyan-400 transition">Movies</a>
+                <a href="/theatres" class="text-cyan-400">Venues</a>
+                <a th:if="${session.adminUser == null}" href="/login" class="bg-cyan-500 text-slate-900 px-4 py-2 rounded-lg">Admin Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-16 px-4 text-center">
+        <h1 class="text-5xl md:text-7xl font-black text-white mb-4 uppercase tracking-tighter">
+            Cinema <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 text-stroke">Redefined</span>
+        </h1>
+        <p class="text-slate-400 max-w-2xl mx-auto text-lg font-light">
+            Discover the most luxurious screens across Pune. From IMAX to Insignia, find your perfect seat.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            
+            <div th:each="t : ${theatres}" class="group relative bg-slate-800/40 rounded-[2.5rem] border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-500 overflow-hidden shadow-2xl">
+                
+                <div class="relative h-72 overflow-hidden">
+                    <img th:src="${t.img}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="Auditorium View">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+                    
+                    <div class="absolute bottom-6 left-6 bg-cyan-500 text-slate-900 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-tighter">
+                        <i class="fas fa-map-marker-alt mr-1"></i> <span th:text="${t.area}">Pune</span>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <h3 class="text-2xl font-black text-white mb-3" th:text="${t.name}">Theatre Name</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8 h-12 overflow-hidden" th:text="${t.desc}">Experience description...</p>
+                    
+                    <div class="flex items-center justify-between pt-6 border-t border-slate-700/50">
+                        
+                        <a th:href="${t.map}" target="_blank" class="w-12 h-12 rounded-2xl bg-slate-700 flex items-center justify-center hover:bg-cyan-500 hover:text-slate-900 transition-all duration-300">
+                            <i class="fas fa-arrow-right -rotate-45 group-hover:rotate-0 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-800 py-10 text-center text-slate-500 text-xs">
+        <p>&copy; 2026 CINEPASS PUNE | PREMIUM CINEMA NETWORK</p>
+    </footer>
+    
+    <div th:replace="~{fragments/header :: ai-assistant}"></div>
+    
+</body>
+</html>

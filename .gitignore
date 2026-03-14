@@ -1,0 +1,15 @@
+# 1. Reset any bad tracking from the target folder
+git rm -r --cached . 2> /dev/null
+
+# 2. Tell Git to ignore the target folder forever
+echo "target/" >> .gitignore
+echo ".gradle/" >> .gitignore
+
+# 3. Add your actual project files
+git add src pom.xml .gitignore
+
+# 4. Commit the changes
+git commit -m "Uploading source code and pom.xml from root"
+
+# 5. Push it to GitHub
+git push -f origin main

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .ticket-card {
+            width: 400px;
+            border: 2px dashed #333;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            border-radius: 15px;
+        }
+        .poster {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .details { margin-top: 15px; }
+        .booking-id { color: #00bcd4; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="ticket-card">
+        <img th:src="${poster}" class="poster" />
+        
+        <div class="details">
+            <h2 th:text="${movieName}">Movie Title</h2>
+            <p><strong>Seats:</strong> <span th:text="${booking.seatsBooked}"></span></p>
+            <p><strong>Time:</strong> <span th:text="${showTime}"></span></p>
+            <p><strong>Amount:</strong> ₹<span th:text="${booking.totalAmount}"></span></p>
+            <hr/>
+            <p class="booking-id">ID: #<span th:text="${booking.bookingId}"></span></p>
+        </div>
+    </div>
+</body>
+</html>
