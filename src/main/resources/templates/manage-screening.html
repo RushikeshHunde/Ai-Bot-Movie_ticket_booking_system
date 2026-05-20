@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Manage Screenings | CinePass Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+.glass-card {
+	background: rgba(15, 23, 42, 0.6);
+	backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body {
+	background: radial-gradient(circle at top right, #111827, #000000);
+}
+/* Style for the datetime input to look better in dark mode */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+	filter: invert(1);
+}
+</style>
+</head>
+<body class="text-white min-h-screen p-8">
+
+	<div class="max-w-7xl mx-auto">
+		<div
+			class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+			<div>
+				<h1
+					class="text-4xl font-black tracking-tighter uppercase text-amber-500">
+					<i class="fas fa-projector mr-3"></i>Active Screenings
+				</h1>
+				<p class="text-slate-400 mt-2 font-medium">Monitoring all movies
+					currently live in the booking system.</p>
+			</div>
+			<div class="flex gap-4">
+				<a th:href="@{/admin/setup-booking}"
+					class="bg-cyan-500 text-black px-6 py-3 rounded-2xl font-black hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 flex items-center">
+					<i class="fas fa-plus-circle mr-2 text-lg"></i> ADD NEW SHOW
+				</a> <a th:href="@{/admin/manage-shows}"
+					class="bg-slate-800 text-white px-6 py-3 rounded-2xl font-bold hover:bg-slate-700 transition border border-slate-700">
+					DASHBOARD </a>
+			</div>
+		</div>
+
+		<div th:if="${param.updated}"
+			class="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400 flex items-center animate-pulse">
+			<i class="fas fa-clock mr-3"></i> <span class="font-bold">RESCHEDULED:</span>
+			The show time has been updated successfully.
+		</div>
+
+		<div
+			class="mb-10 p-2 bg-slate-900/40 rounded-[2rem] border border-slate-800 shadow-inner">
+			<form th:action="@{/admin/manage-screenings}" method="get"
+				class="flex flex-col md:flex-row gap-3">
+				<div class="relative flex-1 group">
+
+					<div th:if="${param.updated}" id="success-alert"
+						class="mb-8 p-5 bg-emerald-500/20 border border-emerald-500/40 rounded-[2rem] text-emerald-400 flex items-center justify-between animate-in fade-in slide-in-from-top duration-500">
+						<div class="flex items-center">
+							<div
+								class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg shadow-emerald-500/40">
+								<i class="fas fa-check text-black"></i>
+							</div>
+							<div>
+								<p class="font-black uppercase tracking-widest text-xs">Update
+									Successful</p>
+								<p class="text-sm opacity-80">The show timing has been
+									rescheduled and is now live.</p>
+							</div>
+						</div>
+						<button
+							onclick="document.getElementById('success-alert').remove()"
+							class="text-emerald-400/50 hover:text-emerald-400">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+
+					<i
+						class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-amber-500 transition-colors"></i>
+					<input type="text" name="keyword" th:value="${keyword}"
+						placeholder="Search by Movie Name or City..."
+						class="w-full bg-slate-950 border border-slate-800 rounded-[1.5rem] py-4 pl-14 pr-4 outline-none focus:border-amber-500/50 transition text-white">
+				</div>
+				<button type="submit"
+					class="bg-amber-500 hover:bg-amber-400 text-black px-10 py-4 rounded-[1.5rem] font-black uppercase text-xs">
+					Filter</button>
+			</form>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+			<div th:each="show : ${shows}"
+				class="glass-card rounded-[2.5rem] overflow-hidden group hover:border-amber-500/50 transition-all duration-500 flex flex-col">
+				<div class="relative h-48 overflow-hidden">
+					<img th:src="${show.movieImageUrl}"
+						class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-700"
+						alt="Poster">
+					<div
+						class="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
+					<div class="absolute bottom-4 left-6">
+						<span
+							class="bg-amber-500 text-black text-[10px] font-black px-3 py-1 rounded-full uppercase"
+							th:text="${show.targetCity}">CITY</span>
+					</div>
+				</div>
+
+				<div class="p-6 flex-1 flex flex-col">
+					<h3 th:text="${show.movieTitle}"
+						class="text-xl font-bold text-white mb-2">Movie Title</h3>
+
+					<div class="flex items-center text-slate-400 text-xs mb-4">
+						<i class="fas fa-calendar-alt mr-2 text-amber-500"></i> Current
+						Time: <span class="ml-1 text-white"
+							th:text="${#temporals.format(show.startTime, 'dd MMM, hh:mm a')}">Time</span>
+					</div>
+
+					<form th:action="@{/admin/update-screening-details}" method="post"
+						class="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 mb-6">
+						<input type="hidden" name="movieId" th:value="${show.id}" /> <label
+							class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Change
+							Show Timing</label>
+						<div class="flex gap-2">
+							<input type="datetime-local" name="newShowTime" required
+								class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+							<button type="submit"
+								class="bg-amber-500 hover:bg-amber-400 text-black px-3 py-2 rounded-lg font-bold text-[10px] uppercase transition">
+								Update</button>
+						</div>
+					</form>
+
+					<div
+						class="mt-auto pt-4 border-t border-slate-800/50 flex items-center justify-between">
+						<span class="text-slate-500 text-[10px]">SHOW ID: #<span
+							th:text="${show.id}">00</span></span> <a
+							th:href="@{'/admin/delete-show/' + ${show.id}}"
+							onclick="return confirm('WARNING: Are you sure? This will fail if tickets are already booked.')"
+							class="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase tracking-tighter">
+							<i class="fas fa-trash-alt mr-1"></i> Emergency Delete
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+    // Automatically hide the success alert after 5 seconds
+    setTimeout(() => {
+        const alert = document.getElementById('success-alert');
+        if (alert) {
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 500);
+        }
+    }, 5000);
+</script>
+
+	<footer class="mt-20 py-10 border-t border-slate-900 text-center">
+		<p
+			class="text-slate-600 text-xs font-medium uppercase tracking-[0.3em]">&copy;
+			2026 CinePass Admin</p>
+	</footer>
+
+</body>
+</html>
