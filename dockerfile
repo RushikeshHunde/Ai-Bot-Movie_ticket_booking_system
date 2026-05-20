@@ -1,0 +1,13 @@
+# Stage 1: Build and compile the Spring Boot JAR
+FROM maven:3-eclipse-temurin-25-alpine AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Stage 2: Create the lightweight, runtime image
+FROM eclipse-temurin:25-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 9000
+ENTRYPOINT ["java", "-jar", "app.jar"]
